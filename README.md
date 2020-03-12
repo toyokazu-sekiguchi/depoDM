@@ -47,7 +47,7 @@ This computes the deposition fraction $f_c(z)$ from dm annihilation into five pr
   - `mult`: (For future extention) multiplicity factor of DM particle. 1 for Majorana and 2 for Dirac.
   - `mode`: Annihilation products. 1 for two $\gamma$, 2 for $e^+e^-$, 3 for $b\bar{b}$, 4 for $W^+W^-$.
 
-## Role of each python file:
+## Role of each python file
 * `const.py`: Definition of units and constants
 * `background.py`: Calculation of cosmological background evolution. 
 * `inifile.py`: Compilation of low-level functions used to read `.ini` file.
@@ -64,11 +64,14 @@ This computes the deposition fraction $f_c(z)$ from dm annihilation into five pr
   - Heating $f_{heat}(z)$
   - Continuum photons $f_{cont}(z)$.
 
-###
 # Notes
 * Flat Universe is assumed.
 * Neutrinos are assumed to consist of three mass eigenstates.
 * 4He abundance $Y_p(\omega_b, N_\nu)$ is fitted with a look-up table in `BBN.dat`, which is taken from CLASS, which are originally obtained using the PArthENoPE code (http://parthenope.na.infn.it).
+
+# Refs
+* Deposition transfer function: http://arxiv.org/abs/1506.03812
+* Phytia code: http://home.thep.lu.se/Pythia/
 
 # Version history
 * March 12nd, 2020
