@@ -74,7 +74,7 @@ This computes the deposition fraction $f_c(z)$ from dm annihilation into five pr
 * Phytia code: http://home.thep.lu.se/Pythia/
 
 # Version history
-* March 12nd, 2020
+* March 12th, 2020
   - Initial release.
 
 # To-do (?) list
