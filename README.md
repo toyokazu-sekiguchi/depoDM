@@ -27,7 +27,7 @@ Compilation is required in order to build a python interface for Phythia8 (writt
 ## Basic usage:
 `python3 driver.py params.ini`
 
-This computes the deposition fraction $f_c(z)$ from dm annihilation into five processes, namely 1) hydrogen ionization, 2) helium ionization, 3) Ly-alpha, 4) heating and 5) continuum photons. To get the Energy deposition of each process per time per volume, multiply computed $f_c(z)$ with the rest mass of a dark matter pair (e.g. $2m_{DM}$) times the rate of dark matter annihilation events ($n_{DM} n_{\overline DM}<\sigma v>$). 
+This computes the deposition fraction $f_c(z)$ from dm annihilation into five processes, namely 1) hydrogen ionization, 2) helium ionization, 3) Ly-alpha, 4) heating and 5) continuum photons. To get the energy deposition of each process per time per volume, multiply computed $f_c(z)$ with the rest mass of a dark matter pair (e.g. $2m_{DM}$) times the rate of dark matter annihilation events ($n_{DM} n_{\overline DM}<\sigma v>$). 
 
 ## Description of input parameter file
 `params.ini` specifies a variety of parameters and consists of five sections:
