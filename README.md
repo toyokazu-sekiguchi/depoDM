@@ -28,7 +28,7 @@ Compilation is required in order to build a python interface for Phythia8 (writt
 
 This computes the deposition fraction $f_c(z)$ from dm annihilation into five processes, namely 1) hydrogen ionization, 2) helium ionization, 3) Ly-alpha, 4) heating and 5) continuum photons. To get the Energy deposition of each process per time per volume, multiply computed $f_c(z)$ with the rest mass of a dark matter pair (e.g. $2m_{DM}$) times the rate of dark matter annihilation events ($n_{DM} n_{\overline DM}<\sigma v>$). 
 
-### Description of input parameter file
+## Description of input parameter file
 `params.ini` specifies a variety of parameters and consists of five sections:
 * [OUTPUT]
   - `root`: Chacters specifying output prefix.
@@ -47,42 +47,34 @@ This computes the deposition fraction $f_c(z)$ from dm annihilation into five pr
   - `mult`: (For future extention) multiplicity factor of DM particle. 1 for Majorana and 2 for Dirac.
   - `mode`: Annihilation products. 1 for two $\gamma$, 2 for $e^+e^-$, 3 for $b\bar{b}$, 4 for $W^+W^-$.
 
-### Role of each python file:
+## Role of each python file:
 * `const.py`: Definition of units and constants
 * `background.py`: Calculation of cosmological background evolution. 
-* `inifile.py`: Module for low-level functions used to read `params.ini` file.
-* `energy.py`: 
-* `ann.py`: 
+* `inifile.py`: Compilation of low-level functions used to read `.ini` file.
+* `energy.py`: Reading and manipulating the transfer functions of energy deposition from Slatyer's results. 
+* `ann.py`: Calculation of spectra ($dN/d\ln E_{kin}$) of photons and electrons/positrons per DM annihilation event based on Pythia8.
 * `driver.py`: Main function.
 
-## Stage 2: Postprocessing
+## Description of Output
+* `[root]_fz.txt`: This contains the main results, namely the deposition efficiency $f_c(z)$ for five channels. This text file consists of six columns in the following order:
+  - "Redshift" $1+z$
+  - Deposition fraction into hydrogen ionization  $f_{H~ion}(z)$
+  - Helium ionization efficiency $f_{He~ion}(z)$
+  - Ly-alpha $f_{Ly-\alpha}(z)$
+  - Heating $f_{heat}(z)$
+  - Continuum photons $f_{cont}(z)$.
 
-### Basic usage:
-`python3 post.py dist.ini`
-
-This analyses MCMC chain(s) produced in Step 1 and obtain parameter constraints as well as triangle plot of posteior distributions.
-
-### Description of parameter files
-`dist.ini` specifies 
-* [POSTPROCESS]
-  - `postroot`: This specifies output prefix.
-  - `paramnames`: Array of parameter names varied in chains. Comma separates items.
-  - `paramlabels`: Array of parameter labels in LaTeX format. They are adopted in plotting. Comma separates items.
-  - `chains`: Array of chain file(s) to be analysed. Comma separates items.
-  - `chainlabels`: Array of chain label(s). They are adopted in plotting. Comma separates items.
-  
+###
 # Notes
-* Flatness is assumed.
+* Flat Universe is assumed.
 * Neutrinos are assumed to consist of three mass eigenstates.
 * 4He abundance $Y_p(\omega_b, N_\nu)$ is fitted with a look-up table in `BBN.dat`, which is taken from CLASS, which are originally obtained using the PArthENoPE code (http://parthenope.na.infn.it).
-* Recombination history is computed based on HyReC (https://pages.jh.edu/~yalihai1/hyrec/hyrec.html). Hyrec in our code is modified from the original one so that massive neutrinos are incorporated and interface to Python is realized by SWIG.
 
 # Version history
-* March 4nd, 2020
-  - Restart functionarity is now supported.
-  - HyRec wrapper is modified. In the previous version, segmentation faults occur when HyRec is located on a path which includes symbolic links. All the files for look-up tables are now referred by their physical pathes.
-* March 2nd, 2020
+* March 12nd, 2020
   - Initial release.
 
-# To-do list 
-- [ ] Parameter estimation of derived parameters
+# To-do (?) list
+- [ ] Cross-check of Pythia calculation.
+- [ ] Incorporation of a recombination code (recfast/HyRec/CosmoRec). Probably this needs to be done as postprocess in a separate code, because none of the available recombination codes are python-native and callback functionarity could be a primary obstacle.
+- [ ] Incorporation of Python version of 21cmFast. Quickie try on my local computer (MacBookPro) failed, probably due to inconsistent setup of gcc (? Default gcc (clang) is mixed with homebrewed one?
