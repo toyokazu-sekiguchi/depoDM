@@ -16,10 +16,11 @@ Code for calculating energy deposition history due to DM annihilation.
 Compilation is required in order to build a python interface for Phythia8 (written in C++ with python interface based on SWIG).
 1. Git clone source file via `git clone https://github.com/toyokazu-sekiguchi/depoDM.git`.
 2. Go to `./depoDM/`.
-3. Download a copy of Phytia8 from `http://home.thep.lu.se/~torbjorn/pythia8/pythia8244.tgz` and then untar it.
-4. Go to `./pythia8244/`, configure with the path to python header `./configure --with-python-include=[path to Python.h]`, and then `make`.
-6. Downloads `elec_processed_results.fits` and `phot_processed_results.fits` from Tracy R. Slatyer's webpage `https://faun.rc.fas.harvard.edu/epsilon/detaileddeposition/general/fits/`.
-5. Go back to the parent directory. 
+3. Downloads `elec_processed_results.fits` and `phot_processed_results.fits` from Tracy R. Slatyer's webpage `https://faun.rc.fas.harvard.edu/epsilon/detaileddeposition/general/fits/` and then put them in a appropriate directory.  
+4. Download a copy of Phytia8 from `http://home.thep.lu.se/~torbjorn/pythia8/pythia8244.tgz` and then untar it.
+5. Go to `./pythia8244/`, configure with the path to python header `./configure --with-python-include=[path to Python.h]`, and then `make`.
+6. Go back to the parent directory. 
+7. Add `./pythia82444/lib/` in `PYTHONPATH`.
 
 # Usage
 
