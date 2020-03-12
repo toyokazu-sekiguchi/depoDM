@@ -1,5 +1,5 @@
 # Description
-Code for calculating energy deposition history due to DM annihilation
+Code for calculating energy deposition history due to DM annihilation.
 
 # Prerequisites (vesion usued in development)
 * Python3 (3.7)
@@ -13,7 +13,7 @@ Code for calculating energy deposition history due to DM annihilation
 * astropy (4.0)
 
 # Installation
-Compilation is required in order to build a python interface for Phythia8 (written in C++)
+Compilation is required in order to build a python interface for Phythia8 (written in C++ with python interface based on SWIG).
 1. Git clone source file via `git clone https://github.com/toyokazu-sekiguchi/depoDM.git`.
 2. Go to `./depoDM/`.
 3. Download a copy of Phytia8 from `http://home.thep.lu.se/~torbjorn/pythia8/pythia8244.tgz` and then untar it.
