@@ -76,5 +76,5 @@ This computes the deposition fraction $f_c(z)$ from dm annihilation into five pr
 
 # To-do (?) list
 - [ ] Cross-check of Pythia calculation.
-- [ ] Incorporation of a recombination code (recfast/HyRec/CosmoRec). Probably this needs to be done as postprocess in a separate code, because none of the available recombination codes are python-native and callback functionarity could be a primary obstacle.
-- [ ] Incorporation of Python version of 21cmFast. Quickie try on my local computer (MacBookPro) failed, probably due to inconsistent setup of gcc (? Default gcc (clang) is mixed with homebrewed one?
+- [ ] Integration of a recombination code (recfast/HyRec/CosmoRec). Probably this needs to be done as postprocess in a separate code, because none of the available recombination codes are python-native and callback functionarity could be a primary obstacle.
+- [ ] Integration of Python version of 21cmFast. Quickie try failed on my local computer (MacBookPro), probably due to inconsistent setup of gcc. (Default gcc, i.e. clang, is mixed with homebrewed one?)
