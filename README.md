@@ -18,6 +18,7 @@ Compilation is required in order to build a python interface for Phythia8 (writt
 2. Go to `./depoDM/`.
 3. Download a copy of Phytia8 from `http://home.thep.lu.se/~torbjorn/pythia8/pythia8244.tgz` and then untar it.
 4. Go to `./pythia8244/`, configure with the path to python header `./configure --with-python-include=[path to Python.h]`, and then `make`.
+6. Downloads `elec_processed_results.fits` and `phot_processed_results.fits` from Tracy R. Slatyer's webpage `https://faun.rc.fas.harvard.edu/epsilon/detaileddeposition/general/fits/`.
 5. Go back to the parent directory. 
 
 # Usage
@@ -25,37 +26,33 @@ Compilation is required in order to build a python interface for Phythia8 (writt
 ## Basic usage:
 `python3 driver.py params.ini`
 
-This first calculates evolution in the fiducial model and MCMC run afterwords. MCMC chains are written in HDF5 format. MCMC tries to restart from previous chains if they exist.
+This computes the deposition fraction $f_c(z)$ from dm annihilation into five processes, namely 1) hydrogen ionization, 2) helium ionization, 3) Ly-alpha, 4) heating and 5) continuum photons. To get the Energy deposition of each process per time per volume, multiply computed $f_c(z)$ with the rest mass of a dark matter pair (e.g. $2m_{DM}$) times the rate of dark matter annihilation events ($n_{DM} n_{\overline DM}<\sigma v>$). 
 
 ### Description of input parameter file
-`test.ini` specifies a variety of parameters and consists of five sections:
+`params.ini` specifies a variety of parameters and consists of five sections:
 * [OUTPUT]
   - `root`: Chacters specifying output prefix.
-* [FIDUCIAL COSMOLOGY]
-  - `ob`, `odm`, `ol`: Density parameters $\Omega_i h^2$ of baryon, dark matter (assuming no decay) and cosmological constant. Note that actual value of $\Omega_{dm} h^2$ and henceforth $h = \sqrt{\sum_i \Omega_i h^2}$ differ from the input value when decay rate is finite.
-  - `decay_rate`: Decay rate of decaying dark matter in units of 1/Gyr.
-  - `mratio`: Mass ratio of massive decay-product to decaying particle $m_1/m_0$.
+* [COSMOLOGY]
+  - `ob`, `odm`, `ode`: Density parameters $\Omega_i h^2$ of baryon, dark matter (assuming no decay) and cosmological constant. Note that actual value of $\Omega_{dm} h^2$ and henceforth $h = \sqrt{\sum_i \Omega_i h^2}$ differ from the input value when decay rate is finite.
   - `nnu`: Effective number of neutrinos. The total number of neutrinos are enhanced by this factor (temperature is fixed to the standard value i.e. $T_\nu = (4/11)^{1/3} T_\gamma$.
   - `mnu`: Sum of neutrino mass in units of eV.
   - `neutrino_hierarchy`: Flag for neutrino mass hierarchy. 1 for normal, 0 for degenerate and -1 for inverted ones.
-* [DDM SETUP] 
-Background evolution is computed based on iteration method using the following parameters.
-  - `num_a`: Number of scale factor bin. Empirically `30` is recommended.  
-  - `max_it`: Maximum iteration number. This is not relevant because usually convergence is achieved within one iteration.
-  - `tol`: Tolerance parameter for the error from the true evolution measured by the current energy density of massless decay-product. Setting to `1e-10` works.
-* [LIKELIHOODS]
-  - `use_BAO`,`use_H0`, `use_CMB`: Flags for whether data is incorporated in likelihood calculation. They should be either `true` of `false`
-* [MCMC]
-  - `ob`, `odm`, `ol`, `decay_rate`, `mratio`, `nnu`, `mnu`: When each parameter is varied in the parameter estimation, three numbers should be given in order: lower limit, upper limit, initial fluctuations. When left as blank, corresponding parameter is fixed to the fiducial value. Comma ',' should be used to separate each item.
-  - `nwalkers`: Number of walkers in affine invariant MCMC sampler. This should be at least twice the number of varied parameters.
-  - `nsteps`: Number of steps for MCMC analysis
-  - `parallel`: If `true`, parallelization is implemented in the MCMC calculation.
+* [NBODY]
+  - `clumpiness`: Path to the text file for look-up table of clumpiness factor; leave it blank if dark matter density is assummed to be uniform.
+* [DEPOSITION]
+  - `epspath`: Path to the directory where the two `.fits` files from Slatyer's webpage are located.
+  - `intype`: Type of injection. 1 for DM annihilation and 2 for DM decay. At present, only annihilation is supported.
+* [ANNIHILATION]
+  - `mass`: Mass of dark matter in GeV.
+  - `mult`: (For future extention) multiplicity factor of DM particle. 1 for Majorana and 2 for Dirac.
+  - `mode`: Annihilation products. 1 for two $\gamma$, 2 for $e^+e^-$, 3 for $b\bar{b}$, 4 for $W^+W^-$.
 
 ### Role of each python file:
 * `const.py`: Definition of units and constants
-* `mdd.py`: Calculation of cosmological background evolution. 
-* `likelihoods.py`: Calculation of likelihood function incorporating recent BAO (arXiv:1607.03155, arXiv:1801.03062, arXiv:1702.00176), direct Hubble measurement (arXiv:2001.03624) and CMB $\theta_*$ (arXiv:1807.06209).
-* `mcmc.py`: MCMC analysis based on Affine Invariant MCMC sampler (emcee). Parallelization is supported based on the multiprocessing python module. Restart functionarity is supported.
+* `background.py`: Calculation of cosmological background evolution. 
+* `inifile.py`: Module for low-level functions used to read `params.ini` file.
+* `energy.py`: 
+* `ann.py`: 
 * `driver.py`: Main function.
 
 ## Stage 2: Postprocessing
