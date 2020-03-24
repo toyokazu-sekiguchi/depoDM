@@ -1,10 +1,11 @@
 # Description
-Code for calculating energy deposition history due to DM annihilation.
+Code for calculating energy deposition history into IGM due to DM annihilation and decay.
 
 # Prerequisites (vesion usued in development)
 * Python3 (3.7)
 * Pythia8 (8.2.44)
 * C++ compiler (gcc Apple LLVM version 10.0.1)
+* SWIG (3.0.12)
 
 ## Python modules
 * numpy (1.18.1)
@@ -21,6 +22,9 @@ Compilation is required in order to build a python interface for Phythia8 (writt
 5. Go to `./pythia8244/`, configure with the path to python header `./configure --with-python-include=[path to Python.h]`, and then `make`.
 6. Go back to the parent directory. 
 7. Add `./pythia82444/lib/` in `PYTHONPATH`.
+8. Go to `./HyRec`.
+9. Edit `INC_PY` and `LIB_PY` in `Makefile`, each of which gives the path to `Python.h` or `libpython*.*.so`. Then `make pyrec`.
+10. Go back to the parent directory.
 
 # Usage
 
@@ -38,15 +42,15 @@ This computes the deposition fraction $f_c(z)$ from dm annihilation into five pr
   - `nnu`: Effective number of neutrinos. The total number of neutrinos are enhanced by this factor (temperature is fixed to the standard value i.e. $T_\nu = (4/11)^{1/3} T_\gamma$.
   - `mnu`: Sum of neutrino mass in units of eV.
   - `neutrino_hierarchy`: Flag for neutrino mass hierarchy. 1 for normal, 0 for degenerate and -1 for inverted ones.
+* []
+  - `intype`: Type of injection. 1 for DM annihilation and 2 for DM decay.
+  - `mass`: Mass of dark matter in GeV.
+  - `mult`: (For future extention) multiplicity factor of DM particle. 1 for Majorana and 2 for Dirac.
+  - `mode`: Annihilation products. 1 for two $\gamma$, 2 for $e^+e^-$, 3 for $b\bar{b}$, 4 for $W^+W^-$.
 * [NBODY]
   - `clumpiness`: Path to the text file for look-up table of clumpiness factor; leave it blank if dark matter density is assummed to be uniform.
 * [DEPOSITION]
   - `epspath`: Path to the directory where the two `.fits` files from Slatyer's webpage are located.
-  - `intype`: Type of injection. 1 for DM annihilation and 2 for DM decay. At present, only annihilation is supported.
-* [ANNIHILATION]
-  - `mass`: Mass of dark matter in GeV.
-  - `mult`: (For future extention) multiplicity factor of DM particle. 1 for Majorana and 2 for Dirac.
-  - `mode`: Annihilation products. 1 for two $\gamma$, 2 for $e^+e^-$, 3 for $b\bar{b}$, 4 for $W^+W^-$.
 
 ## Role of each python file
 * `const.py`: Definition of units and constants
@@ -73,8 +77,12 @@ This computes the deposition fraction $f_c(z)$ from dm annihilation into five pr
 # Refs
 * Deposition transfer function: http://arxiv.org/abs/1506.03812
 * Phytia code: http://home.thep.lu.se/Pythia/
+* HyRec code: https://pages.jh.edu/~yalihai1/hyrec/hyrec.html
 
 # Version history
+* March 24th, 2020
+  - DM decay is now supported.
+  - IGM evolution (ionization fraction & gas temperature) is computed by integrating modified version of HyRec code. Original HyRec is modified so that python 1) interface is enabled
 * March 12th, 2020
   - Initial release.
 
