@@ -12,15 +12,20 @@ Gyr = 1e9*yr
 
 # physical constants
 c = 2.99792458e8 # speed of light [m/s]
+hbar = 1.054571817e-34 # reduced Planck constant [m^2*kg/s]
+m_e = 9.1093837015e-31 # electron mass [kg]
+m_p = 1.67262192369e-27 # proton mass [kg]
 m_H = 1.6735575e-27 # hydrogen atom mass [kg]
 m_He = 6.6464764e-27 # helium4 atom mass [kg]
 sigmaT = 6.6524587158e-29 # Thomson cross section [m^2]
 G = 6.67430e-11 # Newton constant [m^3/kg/s^2]
 kB = 1.38064852e-23 # Boltzmann constant [m^2*kg/s^2/K] 
 eV = 1.602176634e-19 # eV [m^2*kg/s^2]
-hbar = 1.054571817e-34 # reduced Planck constant [m^2*kg/s]
 GeV = eV*1e9 # GeV [m^2*kg/s^2]
 
+alphaEM = 0.0072973525693 # fine structure constant
+Ry = 0.5*alphaEM*alphaEM*m_e*c*c # Rydberg energy
+VH = Ry*m_p/(m_e+m_p) # hydrogen reionization energy
 
 # cosmological units
 BigH = 100*km/Mpc # H0/h = 100km/s/Mpc in [/s]

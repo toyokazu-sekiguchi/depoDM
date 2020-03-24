@@ -125,7 +125,7 @@ class Background:
     def SoundHorizon(self,a):
         return integrate.quad(self.drsda,0,a)[0]
     
-    def UpdateTherm(self):
+    def UpdateTherm(self,Xion,Xexc,Xheat):
         from HyRec import pyrec
         
         if(self.verbose>0): print("thermal history is computed by HyRec")
@@ -133,7 +133,7 @@ class Background:
         okh2 = 0
         w0 = -1
         wa = 0
-        pyrec.rec_build_history_wrap(const.TCMB/const.kB,self.obh2,self.odmh2,ok,self.odeh2,w0,wa,self.yp,self.nu.nnu,tuple(self.nu.mass))
+        pyrec.rec_build_history_wrap(const.TCMB/const.kB,self.obh2,self.odmh2,okh2,self.odeh2,w0,wa,self.yp,self.nu.nnu,tuple(self.nu.mass),tuple(Xion),tuple(Xexc),tuple(Xheat))
 
         '''
         # initial guess based on Hu & Sugiyama 1996
