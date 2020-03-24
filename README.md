@@ -46,7 +46,9 @@ This computes the deposition fraction $f_c(z)$ from dm annihilation into five pr
   - `mass`: Mass of dark matter in GeV.
   - `intype`: Type of injection. 1 for DM annihilation and 2 for DM decay.
   - `mult`: (For future extention) multiplicity factor of DM particle. 1 for Majorana and 2 for Dirac.
-  - `mode`: Annihilation products. 1 for two $\gamma$, 2 for $e^+e^-$, 3 for $b\bar{b}$, 4 for $W^+W^-$.
+  - `mode`: Annihilation products. 1 for two $\gamma$, 2 for $e^+e^-$, 3 $\tau^+\tau^-$, 4 for $b\bar{b}$, 5 for $W^+W^-$.
+  - `sigmav`: Annihilation cross section in cm^3/s. This works only when `intype==1` and is ignored otherwise.
+  - `gamma`: Decay rate in 1/s. This works only when `intype==2` and is ignored otherwise.
 * [NBODY]
   - `clumpiness`: Path to the text file for look-up table of clumpiness factor; leave it blank if dark matter density is assummed to be uniform.
 * [DEPOSITION]
@@ -56,8 +58,9 @@ This computes the deposition fraction $f_c(z)$ from dm annihilation into five pr
 * `const.py`: Definition of units and constants
 * `background.py`: Calculation of cosmological background evolution. 
 * `inifile.py`: Compilation of low-level functions used to read `.ini` file.
-* `energy.py`: Reading and manipulating the transfer functions of energy deposition from Slatyer's results. 
-* `ann.py`: Calculation of spectra ($dN/d\ln E_{kin}$) of photons and electrons/positrons per DM annihilation event based on Pythia8.
+* `deposition.py`: Reading and manipulating the transfer functions of energy deposition from Slatyer's results. 
+* `injection.py`: Calculation of spectra ($dN/d\ln E_{kin}$) of photons and electrons/positrons per DM annihilation event based on Pythia8.
+* `therm.py`: Calculation of IGM thermal history based on HyRec.
 * `driver.py`: Main function.
 
 ## Description of Output
@@ -68,7 +71,11 @@ This computes the deposition fraction $f_c(z)$ from dm annihilation into five pr
   - Ly-alpha $f_{Ly-\alpha}(z)$
   - Heating $f_{heat}(z)$
   - Continuum photons $f_{cont}(z)$.
-
+* `[root]_therm.txt`: This contains the IGM thermal history, consisting of three coluns in the following order:
+  - "Redshift" $1+z$
+  - Ionization fraction $x_e$.
+  - Gas temperature $T_m$.
+  
 # Notes
 * Flat Universe is assumed.
 * Neutrinos are assumed to consist of three mass eigenstates.
@@ -82,11 +89,11 @@ This computes the deposition fraction $f_c(z)$ from dm annihilation into five pr
 # Version history
 * March 24th, 2020
   - DM decay is now supported.
-  - IGM evolution (ionization fraction & gas temperature) is computed by integrating modified version of HyRec code. Original HyRec is modified so that python 1) interface is enabled
+  - IGM evolution (ionization fraction & gas temperature) is computed by integrating modified version of HyRec code. Original HyRec is modified so that python 1) interface is enabled. Due to the application limitation of HyRec, the gas temperature $T_m$ should not be larger than the CMB temperature $T_{\rm CMB}$. This limits the rate of injection, e.g. `sigmav<1e-32` and `gamma 1e-25`. The issue of callback functionarity is circumvented simply by passing arrays.
 * March 12th, 2020
   - Initial release.
 
 # To-do (?) list
-- [ ] Cross-check of Pythia calculation.
-- [ ] Integration of a recombination code (recfast/HyRec/CosmoRec). Probably this needs to be done as postprocess in a separate code, because none of the available recombination codes are python-native, so that callback functionarity will be a primary obstacle.
+- [ ] Integration of energy spectra with larger MC samples from Hiroshima san.
+- [ ] Extension of recombination calculation into $T_m>T_CMB$.
 - [ ] Integration of Python version of 21cmFast. Quickie try failed on my local computer (MacBookPro), probably due to inconsistent setup of gcc. (Default gcc, i.e. clang, is mixed with homebrewed one?)
