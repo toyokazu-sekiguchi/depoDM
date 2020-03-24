@@ -42,9 +42,9 @@ This computes the deposition fraction $f_c(z)$ from dm annihilation into five pr
   - `nnu`: Effective number of neutrinos. The total number of neutrinos are enhanced by this factor (temperature is fixed to the standard value i.e. $T_\nu = (4/11)^{1/3} T_\gamma$.
   - `mnu`: Sum of neutrino mass in units of eV.
   - `neutrino_hierarchy`: Flag for neutrino mass hierarchy. 1 for normal, 0 for degenerate and -1 for inverted ones.
-* []
-  - `intype`: Type of injection. 1 for DM annihilation and 2 for DM decay.
+* [INJECTION]
   - `mass`: Mass of dark matter in GeV.
+  - `intype`: Type of injection. 1 for DM annihilation and 2 for DM decay.
   - `mult`: (For future extention) multiplicity factor of DM particle. 1 for Majorana and 2 for Dirac.
   - `mode`: Annihilation products. 1 for two $\gamma$, 2 for $e^+e^-$, 3 for $b\bar{b}$, 4 for $W^+W^-$.
 * [NBODY]
