@@ -95,5 +95,5 @@ This computes the deposition fraction $f_c(z)$ from dm annihilation into five pr
 
 # To-do (?) list
 - [ ] Integration of energy spectra with larger MC samples from Hiroshima san.
-- [ ] Extension of recombination calculation into $T_m>T_CMB$. Peebles's C-factor is not accurately implemented in the coefficient of the excitation contribution in the equation of the ionization fraction.
+- [ ] Extension of recombination calculation into $T_m>T_CMB$, where HyRec halts. In addition, at the moment Peebles's C-factor is not accurately implemented in the coefficient of the excitation contribution in the equation of the ionization fraction.
 - [ ] Integration of Python version of 21cmFast. Quickie try failed on my local computer (MacBookPro), probably due to inconsistent setup of gcc. (Default gcc, i.e. clang, is mixed with homebrewed one?)
