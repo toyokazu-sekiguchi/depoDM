@@ -1,5 +1,5 @@
 import numpy as np
-#from scipy import interpolate
+from scipy import interpolate
 import const
 import background
 import inifile
@@ -32,14 +32,16 @@ BG.SetParams(paramsfid)
 section = "NBODY"
 path = Ini.ReadString(section,"clumpiness")
 print("\n# cluminess (ignored when intype==2)")
+# clumz is ln(B) as function of ln(1+z) constructed from a lookup table of "z B(z)".
 try:
     tab = np.loadtxt(path)
-    clumz = interpolate.make_interp_spline(tab[:,0],tab[:,1])
+    #clumz = interpolate.make_interp_spline(np.log(1+tab[:,0]),np.log(tab[:,1]))
+    clumz = lambda x:0
     print(" cluminess factor is read from ",path)
-
+    
 except:
     print(" table file for cluminess factor is missing; cluminess is ignored:")
-    clumz = lambda x:1
+    clumz = lambda x:0
 
 # energy deposition
 DE = deposition.Deposit(verbose=1)

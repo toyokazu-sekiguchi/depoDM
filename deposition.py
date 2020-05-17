@@ -77,7 +77,7 @@ class Deposit:
         
     def Calcfc(self,dtauda,clumz):
         for n in range(self.nspecies):
-            gin = np.array([z1k**(self.pow-5)*dtauda(1/z1k)*clumz(z1k-1) for z1k in self.epsdata[n].z1in])
+            gin = np.array([z1k**(self.pow-5)*dtauda(1/z1k)*np.exp(clumz(np.log(z1k))) for z1k in self.epsdata[n].z1in])
             gout = np.array([z1i**(self.pow-5)*dtauda(1/z1i) for z1i in self.epsdata[n].z1out])
             self.epsdata[n].fc = np.sum(self.epsdata[n].tc[:,:,:,:]*gin[None,:,None,None]/gout[None,None,None,:],axis=1)
 

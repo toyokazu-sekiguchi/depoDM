@@ -131,8 +131,8 @@ class Injection:
         self.eRest = pythia8.Hist( "energy spectrum of rest particles", self.nerg, self.ergmin, self.ergmax, True)
 
     def SetRate(self,rate):
-        if(self.intype==1): # annihilation cross section in cm^3/s
-            self.sigmav = rate
+        if(self.intype==1): # annihilation cross section in m^3/s
+            self.sigmav = rate*1e-6
         else: # decay rate in 1/s
             self.gamma = rate
             
