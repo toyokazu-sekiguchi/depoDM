@@ -159,7 +159,8 @@ void interpolate_rates(double Alpha[2], double DAlpha[2], double Beta[2], double
     logTR = log(TR);
 
     /* Check if TM/TR is in the range tabulated */
-    if (TM_TR < TM_TR_MIN || TM_TR > TM_TR_MAX) {
+    //if (TM_TR < TM_TR_MIN || TM_TR > TM_TR_MAX) {
+    if (TM_TR < TM_TR_MIN || TM_TR > TM_TR_MAX*1.001) { // a bit of extrapolation at TM_TR_MAX
       fprintf(stderr, "Error: TM/TR = %f is out of range in interpolate_rates.\n", TM_TR);
       exit(1);
     }

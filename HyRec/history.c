@@ -537,11 +537,18 @@ void rec_get_xe_next1_H(REC_COSMOPARAMS *param, double z_in, double xe_in, doubl
                        double *dxedlna_prev, double *dxedlna_prev2, int *post_saha) {
 
     double dxedlna, TR, nH, ainv, H, TM, zout;
+    //injection
+    double Yion, Yexc, C;
+    //injection
     int model;        
 
     TR = kBoltz*param->T0 * (ainv=1.+z_in);
     nH = 1e-6*param->nH0 * ainv*ainv*ainv;
     H  = rec_HubbleConstant(param, z_in); 
+    //injection
+    Yion = rec_Xion(param, z_in);
+    Yexc = rec_Xexc(param, z_in);
+    //injection
     TM = kBoltz*Tm_in; 
 
     /* Switch off radiative transfer calculation if needed (param->nzrt and izH0 are evaluated in rec_get_cosmoparam) */
@@ -549,6 +556,10 @@ void rec_get_xe_next1_H(REC_COSMOPARAMS *param, double z_in, double xe_in, doubl
 
     dxedlna = rec_dxHIIdlna(model, xe_in, xe_in, nH, H, TM, TR, rate_table, twog_params, 
                             Dfminus_hist, Dfminus_Ly_hist, Dfnu_hist, param->zH0, iz-param->izH0, z_in, param->fsR, param->meR);    
+    //injection
+    C  = 0.5; // not correct; this should be Peebles' C-factor
+    dxedlna += Yion + Yexc * (1.-C);
+    //injection
       
     /* If close to Saha equilibrium (with xHeII = 0), do a post-Saha expansion */
     if (*post_saha == 1) {
@@ -629,6 +640,9 @@ void rec_build_history(REC_COSMOPARAMS *param, HRATEEFF *rate_table, TWO_PHOTON_
    double Delta_xe, xHeII, xH1s;
    double **Dfminus_hist;
    int post_saha;
+   //injection
+   double Yheat;
+   //injection
   
    Dfminus_hist = create_2D_array(NVIRT, param->nzrt);
   
@@ -697,6 +711,10 @@ void rec_build_history(REC_COSMOPARAMS *param, HRATEEFF *rate_table, TWO_PHOTON_
 		           Dfminus_hist, Dfminus_Ly_hist, Dfnu_hist, &dxHIIdlna_prev, &dxHIIdlna_prev2, &post_saha);
         z             = (1.+ZSTART)*exp(-DLNA*iz) - 1.;
         Tm_output[iz] = rec_Tmss(xe_output[iz], param->T0*(1.+z), rec_HubbleConstant(param, z), param->fHe, param->fsR, param->meR);  
+	//injection
+	Yheat = rec_Xheat(param, z);
+	Tm_output[iz] = Tm_output[iz] + rec_HubbleConstant(param, z)/(param->fsR*param->fsR/param->meR/param->meR/param->meR*4.91466895548409e-22)/(param->T0*(1.+z))/(param->T0*(1.+z))/(param->T0*(1.+z))/(param->T0*(1.+z))*(1.+xe_output[iz]+param->fHe)/xe_output[iz]*Yheat/kBoltz*2./3/(1.+xe_output[iz]+param->fHe);
+	//injection
     }
 
     /******** Evolve xe and Tm simultaneously until the lower bounds of integration tables are reached.
