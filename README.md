@@ -46,7 +46,7 @@ This computes the deposition fraction $f_c(z)$ from dm annihilation into five pr
   - `mass`: Mass of dark matter in GeV.
   - `intype`: Type of injection. 1 for DM annihilation and 2 for DM decay.
   - `mult`: (For future extention) multiplicity factor of DM particle. 1 for Majorana and 2 for Dirac.
-  - `mode`: Annihilation products. 1 for two $\gamma$, 2 for $e^+e^-$, 3 $\tau^+\tau^-$, 4 for $b\bar{b}$, 5 for $W^+W^-$.
+  - `mode`: Annihilation products. 1 for two $\gamma$, 2 for $e^+e^-$, 3 $\tau^+\tau^-$, 4 for $b\bar{b}$, 5 for $W^+W^-$ and 6 for $\mu^+\mu^-$.
   - `sigmav`: Annihilation cross section in cm^3/s. This works only when `intype==1` and is ignored otherwise.
   - `gamma`: Decay rate in 1/s. This works only when `intype==2` and is ignored otherwise.
 * [NBODY]
@@ -75,6 +75,12 @@ This computes the deposition fraction $f_c(z)$ from dm annihilation into five pr
   - "Redshift" $1+z$
   - Ionization fraction $x_e$.
   - Gas temperature $T_m$.
+* `[root]_21cm.txt`: This contains 21cm results, consisting of five columns in the following order:
+  - "Redshift" $1+z$
+  - Ionization fraction $x_e$
+  - Spin temperature $T_m$ [K]
+  - 21cm optical depth $\tau_{21cm}$
+  - 21cm differential brightness temperature $\Delta T_{21cm}$ [K].
   
 # Notes
 * Flat Universe is assumed.
@@ -90,10 +96,12 @@ This computes the deposition fraction $f_c(z)$ from dm annihilation into five pr
 * March 24th, 2020
   - DM decay is now supported.
   - IGM evolution (ionization fraction & gas temperature) is computed by integrating modified version of HyRec code. Original HyRec is modified so that python 1) interface is enabled. Due to the application limitation of HyRec, the gas temperature $T_m$ should not be larger than the CMB temperature $T_{\rm CMB}$. This limits the rate of injection, e.g. `sigmav<1e-32` and `gamma 1e-25`. The issue of callback functionarity is circumvented simply by passing arrays.
-* March 12th, 2020
+* March 12nd, 2020
   - Initial release.
+* October 12nd, 2020
+  - 
 
 # To-do (?) list
-- [ ] Integration of energy spectra with larger MC samples from Hiroshima san.
+- ~~[ ] Integration of energy spectra with larger MC samples from Hiroshima san.~~
 - [ ] Extension of recombination calculation into $T_m>T_CMB$, where HyRec halts. In addition, at the moment Peebles's C-factor is not accurately implemented in the coefficient of the excitation contribution in the equation of the ionization fraction.
 - [ ] Integration of Python version of 21cmFast. Quickie try failed on my local computer (MacBookPro), probably due to inconsistent setup of gcc. (Default gcc, i.e. clang, is mixed with homebrewed one?)
