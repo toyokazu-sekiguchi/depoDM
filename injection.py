@@ -1,6 +1,7 @@
 import pythia8
 import numpy as np
 import sys
+from scipy import interpolate
 
 # A derived class for (e+ e- ->) GenericResonance -> various final states.
 class Sigma1GenRes(pythia8.SigmaProcess):
@@ -88,7 +89,7 @@ def main07():
     eP     *= 2.5 / nEvent
     eNu    *= 2.5 / nEvent
     eRest  *= 2.5 / nEvent
-    print(eGamma,eE,eP,eNu,eRest)
+    #print(eGamma,eE,eP,eNu,eRest)
 
     # Write Python code that can generate a PDF file with the spectra.
     # Assuming you have Python installed on your platform, do as follows.
@@ -113,26 +114,29 @@ class Injection:
     def __init__(self,verbose=0):
         self.verbose = verbose
 
-    def SetParams(self,intype,mass,mult,mode,nerg,ergmin,ergmax):
+    def SetParams(self,intype,mass,mult,mode,use_prec,nerg,ergmin,ergmax):
         self.intype = intype
         self.mass = mass
         self.eCM = 2*self.mass if self.intype==1 else self.mass
         self.mult = mult
         self.mode = mode
+        self.use_prec = use_prec
         self.nerg = nerg
         self.ergmin = ergmin
         self.ergmax = ergmax
         self.dlnerg = np.log(ergmax/ergmin)/self.nerg
         self.erg = np.logspace(np.log10(self.ergmin),np.log10(self.ergmax),self.nerg,base=10)
-        self.eGamma = pythia8.Hist("energy spectrum of photons",        self.nerg, self.ergmin, self.ergmax, True)
-        self.eE = pythia8.Hist(    "energy spectrum of e+ and e-",      self.nerg, self.ergmin, self.ergmax, True)
-        self.eP = pythia8.Hist(    "energy spectrum of p and pbar",     self.nerg, self.ergmin, self.ergmax, True)
-        self.eNu = pythia8.Hist(   "energy spectrum of neutrinos",      self.nerg, self.ergmin, self.ergmax, True)
-        self.eRest = pythia8.Hist( "energy spectrum of rest particles", self.nerg, self.ergmin, self.ergmax, True)
+        if(not use_prec):
+            self.eGamma = pythia8.Hist("energy spectrum of photons",        self.nerg, self.ergmin, self.ergmax, True)
+            self.eE = pythia8.Hist(    "energy spectrum of e+ and e-",      self.nerg, self.ergmin, self.ergmax, True)
+            self.eP = pythia8.Hist(    "energy spectrum of p and pbar",     self.nerg, self.ergmin, self.ergmax, True)
+            self.eNu = pythia8.Hist(   "energy spectrum of neutrinos",      self.nerg, self.ergmin, self.ergmax, True)
+            self.eRest = pythia8.Hist( "energy spectrum of rest particles", self.nerg, self.ergmin, self.ergmax, True)
 
     def SetRate(self,rate):
+        import const
         if(self.intype==1): # annihilation cross section in m^3/s
-            self.sigmav = rate*1e-6
+            self.sigmav = rate*const.cm**3
         else: # decay rate in 1/s
             self.gamma = rate
             
@@ -155,8 +159,10 @@ class Injection:
             pythia.readString("999999:addChannel = 1 1. 101 5  -5  !  -> b bbar")
         elif(self.mode==5):
             pythia.readString("999999:addChannel = 1 1. 101 24 -24 !  -> W+ W-")
+        elif(self.mode==6):
+            pythia.readString("999999:addChannel = 1 1. 101 13 -13 !  -> mu+ mu-")
         else:
-            print("error: only gamma, e, b and W are supported")
+            print("error: only gamma, e, tau, b, W and mu are supported")
             sys.exit(1)
         pythia.init()
         
@@ -218,14 +224,50 @@ class Injection:
         if(self.eCM<10): #this is where Pythia doesn't work
             self.spec_elec = np.zeros(self.nerg) 
             self.spec_phot = np.zeros(self.nerg)
-            j = int(np.log(self.mass/self.erg[0])/np.log(self.erg[self.nerg-1]/self.erg[0])*(self.nerg-1))
             if(self.mode==1):
+                j = int(np.log(self.mass/self.erg[0])/np.log(self.erg[self.nerg-1]/self.erg[0])*(self.nerg-1))
                 self.spec_phot[j] = 1.
             elif(self.mode==2):
+                j = int(np.log(self.mass/self.erg[0])/np.log(self.erg[self.nerg-1]/self.erg[0])*(self.nerg-1))
+                self.spec_elec[j] = 1.
+            elif(self.mode==6):
+                j = int(np.log(self.mass/3/self.erg[0])/np.log(self.erg[self.nerg-1]/self.erg[0])*(self.nerg-1))
                 self.spec_elec[j] = 1.
             else:
                 print("error: only mode==1 or 2 is supported at mass<5GeV because of the limitation of Pythia")
                 sys.exit(1)
+
+        elif(self.use_prec):
+            from addon import function #please set annmode in the form of  'WW', 'bb', 'tautau', 'ee', or '2gam'
+            if(self.mode==1):
+                annmode = '2gam'
+            elif(self.mode==2):
+                annmode = 'ee'
+            elif(self.mode==3):
+                annmode = 'tautau'
+            elif(self.mode==4):
+                annmode = 'bb'
+            elif(self.mode==5):
+                annmode = 'WW'
+            else:
+                print("error: only gamma, e, tau, b and W are supported")
+                sys.exit(1)
+            s=function.spectra(self.mass,annmode)
+            #debug
+            #np.savetxt('debug/'+annmode+'0.txt',np.concatenate([s[0][:,None],s[1][:,None],s[2][:,None],s[3][:,None]],axis=1))
+            #debug
+            #spl_elec = interpolate.make_interp_spline(np.log(s[0]),(s[2]+s[3])*s[0]*self.dlnerg/self.eCM)
+            #spl_phot = interpolate.make_interp_spline(np.log(s[0]),s[1]*s[0]*self.dlnerg/self.eCM)
+            #self.spec_elec = np.array([spl_elec(np.log(erg)) for erg in self.erg])
+            #self.spec_phot = np.array([spl_phot(np.log(erg)) for erg in self.erg])
+            spl_elec = interpolate.make_interp_spline(np.log(s[0]),(s[2]+s[3]))
+            spl_phot = interpolate.make_interp_spline(np.log(s[0]),s[1])
+            self.spec_elec = np.array([spl_elec(np.log(erg)) for erg in self.erg])*self.erg[:]*self.dlnerg/self.eCM
+            self.spec_phot = np.array([spl_phot(np.log(erg)) for erg in self.erg])*self.erg[:]*self.dlnerg/self.eCM
+            #debug
+            #np.savetxt('debug/'+annmode+'1.txt',np.concatenate([self.erg[:,None],self.spec_phot[:,None],self.spec_elec[:,None]],axis=1))
+            #debug
+            
         else:
             self.RunPythia()
             self.spec_elec = np.array([self.erg[j]*self.eE.getBinContent(j+1) for j in range(self.nerg)])*self.dlnerg/self.eCM

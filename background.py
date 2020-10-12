@@ -5,7 +5,7 @@ import const
 class BBN:
     
     def __init__(self):
-        filename = "./bbn.dat" # based on PArthENoPE taken from CLASS 
+        filename = "./data/bbn.dat" # based on PArthENoPE taken from CLASS 
         data = np.loadtxt(filename)
         self.spl_yp = interpolate.interp2d(data[:,0],data[:,1],data[:,2],kind="linear") # cubic doesn't work; why?
         
@@ -119,7 +119,7 @@ class Background:
         return integrate.quad(self.dtauda,a1,a2)[0]
     
     def drsda(self,a):
-        cs = np.sqrt(1/3/(1+0.75*a*self.ob/self.og))*const.c
+        cs = np.sqrt(1/3/(1+0.75*a*self.obh2/self.ogh2))*const.c
         return cs*self.dtauda(a)
     
     def SoundHorizon(self,a):
@@ -134,7 +134,7 @@ class Background:
         w0 = -1
         wa = 0
         pyrec.rec_build_history_wrap(const.TCMB/const.kB,self.obh2,self.odmh2,okh2,self.odeh2,w0,wa,self.yp,self.nu.nnu,tuple(self.nu.mass),tuple(Xion),tuple(Xexc),tuple(Xheat))
-
+        
         '''
         # initial guess based on Hu & Sugiyama 1996
         ob = self.obh2
@@ -163,7 +163,7 @@ class Background:
             tau_opt[i] = tau_opt[i-1]+integrate.quad(lambda z:
                                 pyrec.hyrec_xe(1/(z+1))*akthom*self.dtauda(1/(z+1)),zthrm[i-1],zthrm[i])[0]
             tau_drag[i] = tau_drag[i-1]+integrate.quad(lambda z:
-                                pyrec.hyrec_xe(1/(z+1))*akthom*self.dtauda(1/(z+1))/(0.75*self.ob/self.og/(1+z)),zthrm[i-1],zthrm[i])[0]
+                                pyrec.hyrec_xe(1/(z+1))*akthom*self.dtauda(1/(z+1))/(0.75*self.obh2/self.ogh2/(1+z)),zthrm[i-1],zthrm[i])[0]
         spl_opt = interpolate.make_interp_spline(np.log(zthrm[1:]),np.log(tau_opt[1:]))
         spl_drag = interpolate.make_interp_spline(np.log(zthrm[1:]),np.log(tau_drag[1:]))
             

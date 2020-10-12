@@ -5,6 +5,7 @@ from scipy import special
 
 # astronomical units
 km = 1e3 # km [m]
+cm = 1e-2 #cm [m]
 pc = 3.085675e16 # parsec [m]
 Mpc = 1e6*pc
 yr = 3.1557600e7 # year [s]
@@ -26,6 +27,9 @@ GeV = eV*1e9 # GeV [m^2*kg/s^2]
 alphaEM = 0.0072973525693 # fine structure constant
 Ry = 0.5*alphaEM*alphaEM*m_e*c*c # Rydberg energy
 VH = Ry*m_p/(m_e+m_p) # hydrogen reionization energy
+f21cm = 1420.40575e6 # frequency of hydrogen 21cm line emission [1/s]
+E21cm = hbar/(2*np.pi)*f21cm # energy of hydrogen 21cm line emission [m^2*kg/s^2]
+A10 = 2.869e-15 # hydrogen 21cm line transision rate [1/s]
 
 # cosmological units
 BigH = 100*km/Mpc # H0/h = 100km/s/Mpc in [/s]

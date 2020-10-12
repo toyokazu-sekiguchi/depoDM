@@ -5,64 +5,78 @@ import background
 import inifile
 import injection
 import deposition
-import sys
-#from matplotlib import pyplot as plt
 import therm
 
-args = sys.argv
-if(len(args)<2):
-    print("error: the number of input parameters is not correct; input command must be")
-    print(">$ python driver.py params.ini")
-    sys.exit(1)
+
+def main(paramfile,verbose):
     
-Ini = inifile.IniFile(args[1])
-Ini.Dump()
+    Ini = inifile.IniFile(paramfile)
+    if(verbose>0):
+        Ini.Dump()
 
-section = "OUTPUT"
-root = Ini.ReadString(section,"root")
+    section = "OUTPUT"
+    root = Ini.ReadString(section,"root")
     
-# fiducial cosmology
-BG = background.Background(verbose=1)
-section = "COSMOLOGY"
-paramsfid = np.array([Ini.ReadFloat(section,"ob"),Ini.ReadFloat(section,"odm"),Ini.ReadFloat(section,"ode"),
-                      Ini.ReadFloat(section,"nnu"),Ini.ReadFloat(section,"mnu")])
-BG.SetParams(paramsfid)
+    # fiducial cosmology
+    BG = background.Background(verbose=verbose)
+    section = "COSMOLOGY"
+    paramsfid = np.array([Ini.ReadFloat(section,"ob"),Ini.ReadFloat(section,"odm"),Ini.ReadFloat(section,"ode"),
+                          Ini.ReadFloat(section,"nnu"),Ini.ReadFloat(section,"mnu")])
+    BG.SetParams(paramsfid)
 
-# clumpiness
-section = "NBODY"
-path = Ini.ReadString(section,"clumpiness")
-print("\n# cluminess (ignored when intype==2)")
-# clumz is ln(B) as function of ln(1+z) constructed from a lookup table of "z B(z)".
-try:
-    tab = np.loadtxt(path)
-    #clumz = interpolate.make_interp_spline(np.log(1+tab[:,0]),np.log(tab[:,1]))
-    clumz = lambda x:0
-    print(" cluminess factor is read from ",path)
-    
-except:
-    print(" table file for cluminess factor is missing; cluminess is ignored:")
-    clumz = lambda x:0
+    # clumpiness
+    section = "NBODY"
+    path = Ini.ReadString(section,"clumpiness")
+    if(verbose>0):
+        print("\n# cluminess (ignored when intype==2)")
+        # clumz is ln(B) as function of ln(1+z) constructed from a lookup table of "z B(z)".
+    try:
+        tab = np.loadtxt(path)
+        clumz = interpolate.make_interp_spline(np.log(1+tab[:,0]),np.log(1+tab[:,1]))
+        if(verbose>0):
+            print(" cluminess factor is read from ",path)
+    except:
+        if(verbose>0):
+            print(" table file for clumpiness factor is missing; cluminess is ignored:")
+        clumz = lambda x:0
 
-# energy deposition
-DE = deposition.Deposit(verbose=1)
-section = "DEPOSITION"
-DE.SetParams(Ini.ReadString(section,"epspath"),Ini.ReadInt("INJECTION","intype"))
-DE.Calcfc(BG.dtauda,clumz)
+    # energy deposition
+    DE = deposition.Deposit(verbose=verbose)
+    section = "DEPOSITION"
+    DE.SetParams(Ini.ReadString(section,"epspath"),Ini.ReadInt("INJECTION","intype"))
+    DE.Calcfc(BG.dtauda,clumz)
 
-# injection spectrum phythia
-INJ = injection.Injection(verbose=1)
-section = "INJECTION"
-mspec = 5
-INJ.SetParams(DE.intype,Ini.ReadFloat(section,"mass"),Ini.ReadInt(section,"mult"),Ini.ReadInt(section,"mode"),
-              DE.nerg*mspec,DE.erg[0]*const.eV/const.GeV,DE.erg[DE.nerg-1]*const.eV/const.GeV)
-INJ.SetRate(Ini.ReadFloat(section,"sigmav") if INJ.intype==1 else Ini.ReadFloat(section,"gamma"))
-INJ.GetBinnedNumber()
+    # injection spectrum phythia
+    INJ = injection.Injection(verbose=verbose)
+    section = "INJECTION"
+    mspec = 5
+    INJ.SetParams(DE.intype,Ini.ReadFloat(section,"mass"),Ini.ReadInt(section,"mult"),Ini.ReadInt(section,"mode"),
+                  Ini.ReadBoolean(section,"use_prec"),DE.nerg*mspec,DE.erg[0]*const.eV/const.GeV,DE.erg[DE.nerg-1]*const.eV/const.GeV)
+    INJ.SetRate(Ini.ReadFloat(section,"sigmav") if INJ.intype==1 else Ini.ReadFloat(section,"gamma"))
+    INJ.GetBinnedNumber()
 
-# IGM evolution
-TH = therm.Therm(verbose=1)
-TH.SetParams(root)
-TH.IntegEnergy(DE,INJ)
-TH.ThermInput(BG,DE,INJ)
+    # IGM evolution
+    TH = therm.Therm(verbose=verbose)
+    TH.SetParams(root)
+    TH.IntegEnergy(DE,INJ)
+    TH.ThermInput(BG,DE,INJ)
+    TH.EvolveTspin(BG,DE,INJ)
+
+    #for EDGES???
+    if(verbose>0):
+        print(INJ.mass,INJ.sigmav/const.cm**3,TH.dT21cm_edges)
+    return TH.dT21cm_edges
+
+if __name__ == '__main__':
+    import sys
+
+    args = sys.argv
+    if(len(args)<2):
+        print("error: the number of input parameters is not correct; input command must be")
+        print(">$ python driver.py params.ini")
+        sys.exit(1)
+
+    main(args[1],1)
 
 '''
 fz_elec = np.empty([DE.nch,DE.nz1out])

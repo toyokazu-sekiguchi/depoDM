@@ -32,15 +32,15 @@ class IniFile:
     def ReadString(self,section,key):
         return self.ini[section][key]
     
-def main():
-    args = sys.argv
-    if(len(args)<2):
-        print("error: the number of input parameters is not correct; input command must be")
-        print(">$ python inifiles.py input_file_name")
-        sys.exit(1)
+#def main():
+#    args = sys.argv
+#    if(len(args)<2):
+#        print("error: the number of input parameters is not correct; input command must be")
+#        print(">$ python inifiles.py input_file_name")
+#        sys.exit(1)
         
-    Ini = IniFile(args[1])
-    Ini.Dump("test.out")
+#    Ini = IniFile(args[1])
+#    Ini.Dump("test.out")
 
-if __name__=='__main__':
-    main()
+#if __name__=='__main__':
+#    main()

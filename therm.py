@@ -67,3 +67,60 @@ class Therm:
                 arr[i,2] = pyrec.hyrec_tm(1/arr[i,0])
             np.savetxt(self.root+"_therm.txt",arr)
 
+    def EvolveTspin(self,BG,DE,INJ):
+        # initialize interpolation of collisional coupling rates
+        filename = "./data/kappaHH.dat" # based on Table 3 in https://arxiv.org/abs/astro-ph/0608032
+        data = np.log(np.loadtxt(filename))
+        self.spl_kappaHH = interpolate.make_interp_spline(data[:,0],data[:,1])
+        filename = "./data/kappaHe.dat" # based on Table 4 in https://arxiv.org/abs/astro-ph/0608032
+        data = np.log(np.loadtxt(filename))
+        self.spl_kappaHe = interpolate.make_interp_spline(data[:,0],data[:,1])
+
+        nz1=100
+        z1start = 1000
+        z1end = 1
+        dlnz1 = np.log(z1end/z1start)/(nz1-1)
+        arr = np.empty([nz1,5])
+        
+        nH0 = BG.obh2/(const.m_H*const.c*const.c)*(1-BG.yp)*const.rhoch2
+        
+        for i in range(nz1):
+            from HyRec import pyrec
+            z1 = z1start*np.exp(dlnz1*i)
+            a = 1/z1
+            Tr = const.TCMB/const.kB*z1
+            xe = pyrec.hyrec_xe(a)
+            Tm = pyrec.hyrec_tm(a)
+            Tc = Tm # this should be valid when Ly-alpha is optically thick
+            
+            nH = nH0*z1*z1*z1
+            ne = nH*xe
+            nH = nH*(1-xe)
+            
+            lnTm = np.log(Tm)
+            x_c = nH*np.exp(self.spl_kappaHH(lnTm))+ne*np.exp(self.spl_kappaHe(lnTm))
+            x_c = x_c*const.E21cm/(const.TCMB*z1)/const.A10
+            
+            x_alpha = 0
+            #x_alpha = (16*np.pi*np.pi*np.pi*const.alphaEM/const.m_e/const.c)*0.4162*4/27/const.A10*const.E21cm/const.TCMB/z1
+            #x_alpha = x_alpha* a*a*BG.dtauda(a)/16*(const.c*const.hbar*2*np.pi)/(const.VH*const.VH*9/16)*#(dE/dV/dt)_injection*f_exc
+                
+            #Tspin = (1+x_c+x_alpha)/(1/Tr+x_c/Tm+x_alpha/Tc)
+            Tspin = Tm
+
+            tau_21cm = 3*const.c**3*const.hbar*const.A10*nH/(16*const.kB*const.f21cm**2*Tspin)*BG.dtauda(a)*a**2
+                
+            arr[i,0] = z1
+            arr[i,1] = xe
+            arr[i,2] = Tspin
+            arr[i,3] = tau_21cm
+            #arr[i,3] = 8.6e-3*(1-xe)*(Tr/Tspin)*np.sqrt((BG.obh2+BG.odmh2)/0.15*z1/10)*BG.obh2/0.02
+            arr[i,4] = (Tspin-Tr)/z1*tau_21cm
+            #arr[i,4] = 23e-3*(1-xe)*(1-Tr/Tspin)*np.sqrt((BG.obh2+BG.odmh2)/0.15*z1/10)*BG.obh2/0.02
+        if(self.verbose>0):
+            np.savetxt(self.root+"_21cm.txt",arr)
+        
+        # For EDGES
+        z_edges=17
+        spl_21cm=interpolate.interp1d(arr[:,0],arr[:,4])
+        self.dT21cm_edges = spl_21cm([z_edges])[0]
